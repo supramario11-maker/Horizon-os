@@ -1,15 +1,19 @@
-# generate_ipad_workspace.py - Workspace setup for iPad + GitHub Actions
+# generate_ipad_workspace.py - Workspace setup for iPad + GitHub Actions (FIXED PATHS)
 import os
 
 def create_file(path, content):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    # Fix the bug: Only make directories if a directory path actually exists
+    dirname = os.path.dirname(path)
+    if dirname: 
+        os.makedirs(dirname, exist_ok=True)
+        
     with open(path, 'w', encoding='utf-8') as f:
         f.write(content.strip() + '\n')
     print(f"Generated: {path}")
 
 print("🌅 Building Horizon OS Cloud Architecture Configuration...")
 
-# ---- 1. GitHub Actions Auto-Compiler (The most important part for iPad) ----
+# ---- 1. GitHub Actions Auto-Compiler ----
 create_file(".github/workflows/build.yml", """
 name: Horizon OS Compiler Pipeline
 
@@ -33,7 +37,6 @@ jobs:
 
     - name: Compile OS and Multi-Format Runtimes
       run: |
-        # Emulating cross-compiler flags using standard multilib
         nasm -f elf32 src/boot.asm -o boot.o
         gcc -m32 -c -ffreestanding -O2 src/kernel.c -o kernel.o
         ld -m elf_i386 -T src/linker.ld boot.o kernel.o -o horizon.bin
@@ -43,7 +46,6 @@ jobs:
     - name: Initialize Large App Store Storage Allocation
       run: |
         echo "Creating large system asset maps (>8 GB)..."
-        # Allocates blank dense files safely in the cloud runner to structure storage indexes
         dd if=/dev/zero of=horizon_store_data.img bs=1M count=8200
         echo "Large-scale app indexes structured successfully."
 
@@ -152,4 +154,4 @@ int main() {
 # ---- 7. .gitignore ----
 create_file(".gitignore", "*.o\n*.bin\nhorizon_subsystem\nhorizon_store\n*.img")
 
-print("✅ Workspace generated successfully! Move these folders to your Git workspace.")
+print("✅ Workspace generated successfully with no path errors!")
