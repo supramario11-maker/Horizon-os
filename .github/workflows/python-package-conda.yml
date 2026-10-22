@@ -1,5 +1,5 @@
 # .github/workflows/build.yml
-name: Horizon OS Dynamic ISO Pipeline
+name: Horizon OS Heavy ISO Pipeline
 
 on:
   push:
@@ -39,27 +39,32 @@ jobs:
         g++ -O2 src/subsystem_manager.cpp -o horizon_subsystem
         g++ -O2 src/store/store_manager.cpp -o horizon_store
 
-    - name: Package Kernel and Assets into Bootable ISO
+    - name: Structure and Pack 8GB+ Bootable ISO Image
       run: |
         mkdir -p iso_root/boot/grub
         mkdir -p iso_root/assets
+        mkdir -p iso_root/store_data
+        
         cat << 'EOF' > iso_root/boot/grub/grub.cfg
         menuentry "Horizon OS v1.0" {
             multiboot /boot/horizon.bin
             boot
         }
         EOF
+        
         cp horizon.bin iso_root/boot/horizon.bin
+        cp horizon_subsystem iso_root/boot/horizon_subsystem
+        cp horizon_store iso_root/boot/horizon_store
         if [ -f assets/extant ]; then cp assets/extant iso_root/assets/extant; fi
+        
+        # Inject the 8GB file allocation inside the folder tree before assembling the ISO
+        dd if=/dev/zero of=iso_root/store_data/horizon_packages.db bs=1M count=8200
+        
         grub-mkrescue -o horizon.iso iso_root
 
-    - name: Allocate Massive Store Image Footprint
-      run: |
-        dd if=/dev/zero of=horizon_store_data.img bs=1M count=8200
-
-    - name: Upload Compiled Horizon OS Distribution
+    - name: Upload High Capacity Horizon ISO Distribution
       uses: actions/upload-artifact@v4
       with:
-        name: Horizon-OS-Cloud-Distribution
+        name: Horizon-OS-HighCapacity-ISO
         path: |
           horizon.iso
