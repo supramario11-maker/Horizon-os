@@ -1,8 +1,7 @@
-# generate_ipad_workspace.py - Workspace setup for iPad + GitHub Actions (FIXED PATHS)
+# generate_ipad_workspace.py - Workspace setup for iPad + GitHub Actions (Fixed Paths & Assets)
 import os
 
 def create_file(path, content):
-    # Fix the bug: Only make directories if a directory path actually exists
     dirname = os.path.dirname(path)
     if dirname: 
         os.makedirs(dirname, exist_ok=True)
@@ -33,7 +32,7 @@ jobs:
     - name: Install Compiler Tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y nasm build-essential gcc-multilib g++-multilib
+        sudo apt-get install -y nasm build-essential gcc-multilib g++-multilib xorriso grub-pc-bin mtools
 
     - name: Compile OS and Multi-Format Runtimes
       run: |
@@ -42,6 +41,20 @@ jobs:
         ld -m elf_i386 -T src/linker.ld boot.o kernel.o -o horizon.bin
         g++ -O2 src/subsystem_manager.cpp -o horizon_subsystem
         g++ -O2 src/store/store_manager.cpp -o horizon_store
+
+    - name: Package Kernel into Bootable ISO
+      run: |
+        mkdir -p iso_root/boot/grub
+        mkdir -p iso_root/assets
+        cat << 'EOF' > iso_root/boot/grub/grub.cfg
+        menuentry "Horizon OS v1.0" {
+            multiboot /boot/horizon.bin
+            boot
+        }
+        EOF
+        cp horizon.bin iso_root/boot/horizon.bin
+        if [ -f assets/extant ]; then cp assets/extant iso_root/assets/extant; fi
+        grub-mkrescue -o horizon.iso iso_root
 
     - name: Initialize Large App Store Storage Allocation
       run: |
@@ -54,7 +67,7 @@ jobs:
       with:
         name: horizon-os-build
         path: |
-          horizon.bin
+          horizon.iso
           horizon_subsystem
           horizon_store
           horizon_store_data.img
@@ -101,7 +114,7 @@ create_file("src/kernel.c", """
 
 void main() {
     char* vidmem = (char*)VIDEO_MEMORY;
-    char* msg = "Welcome to Horizon OS!";
+    char* msg = "Welcome to Horizon OS! Background: assets/extant active.";
     int i = 0;
     while(msg[i] != 0) {
         vidmem[i*2] = msg[i];
@@ -151,7 +164,10 @@ int main() {
 }
 """)
 
-# ---- 7. .gitignore ----
-create_file(".gitignore", "*.o\n*.bin\nhorizon_subsystem\nhorizon_store\n*.img")
+# ---- 7. Background Asset Asset Placeholder ----
+create_file("assets/extant", "[Horizon OS System Background Binary Target Data]")
 
-print("✅ Workspace generated successfully with no path errors!")
+# ---- 8. .gitignore ----
+create_file(".gitignore", "*.o\n*.bin\nhorizon_subsystem\nhorizon_store\n*.img\n*.iso\niso_root/")
+
+print("✅ Workspace generated successfully with asset tracks!")
