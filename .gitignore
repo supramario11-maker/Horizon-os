@@ -1,5 +1,5 @@
 *.o
-*.bin
+*.elf
 horizon_subsystem
 horizon_store
 *.img

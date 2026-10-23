@@ -1,7 +1,5 @@
 #include <iostream>
-#include <string>
-
 int main() {
-    std::cout << "[Horizon Subsystem Router] Parsing cross-architecture requests...\n";
+    std::cout << "[Horizon Subsystem Router] ARM64 Binary Mapping Active.\n";
     return 0;
 }

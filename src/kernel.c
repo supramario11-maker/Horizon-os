@@ -1,15 +1,18 @@
-// kernel.c - Core Kernel Logic
-#define VIDEO_MEMORY 0xB8000
-#define WHITE_ON_BLACK 0x0f
-
+// kernel.c - ARM64 Embedded System Vector initialization
 void main() {
-    char* vidmem = (char*)VIDEO_MEMORY;
-    char* msg = "Welcome to Horizon OS! File System Verified (>8GB Allocated)";
+    // Standard RAM diagnostic address location pointer assignment
+    volatile char* uart = (volatile char*)0x09000000; 
+    char* msg = "Welcome to Horizon OS (ARM64 Mobile Build Mode Active)\n";
+    
     int i = 0;
-    while(msg[i] != 0) {
-        vidmem[i*2] = msg[i];
-        vidmem[i*2+1] = WHITE_ON_BLACK;
+    while (msg[i] != 0) {
+        *uart = msg[i]; // Forward payload characters straight to core terminal channels
         i++;
     }
-    while(1);
+    
+    while(1); // Keep CPU alive safely
+}
+
+void _start() {
+    main();
 }

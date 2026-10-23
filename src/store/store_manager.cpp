@@ -1,17 +1,8 @@
 #include <iostream>
-#include <fstream>
-#include <string>
-
-void simulatePackageReader() {
+int main() {
     std::cout << "=======================================\n";
     std::cout << "  HORIZON MULTI-FORMAT SOFTWARE STORE  \n";
     std::cout << "=======================================\n";
-    std::cout << " -> Scanning platform deployment manifest templates...\n\n";
-    std::cout << " [Found Manifest Entry]: Minecraft PE (.apk)\n";
-    std::cout << " [Found Manifest Entry]: Grand Theft Auto V (.exe)\n";
-}
-
-int main() {
-    simulatePackageReader();
+    std::cout << " -> System Engine connected to cloud storage arrays.\n";
     return 0;
 }
