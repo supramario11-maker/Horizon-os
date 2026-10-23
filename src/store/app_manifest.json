@@ -4,14 +4,12 @@
     {
       "name": "Minecraft PE",
       "extension": "apk",
-      "runtime_engine": "Waydroid Container Environment",
-      "source_mirror": "https://googleplay.internal"
+      "runtime_engine": "Waydroid Container Environment"
     },
     {
       "name": "Grand Theft Auto V",
       "extension": "exe",
-      "runtime_engine": "Horizon Win32 API Translation Layer",
-      "source_mirror": "Local Iso Storage Repository"
+      "runtime_engine": "Horizon Win32 API Translation Layer"
     }
   ]
 }

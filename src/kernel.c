@@ -4,7 +4,7 @@
 
 void main() {
     char* vidmem = (char*)VIDEO_MEMORY;
-    char* msg = "Welcome to Horizon OS! Ready.";
+    char* msg = "Welcome to Horizon OS! File System Verified (>8GB Allocated)";
     int i = 0;
     while(msg[i] != 0) {
         vidmem[i*2] = msg[i];

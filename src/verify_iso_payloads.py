@@ -26,20 +26,21 @@ def scan_workspace(root_directory):
     
     print(f" [*] Total files detected in ISO build route: {total_file_count}")
     print(f" [*] Cumulative storage footprint measured:  {total_gb:.2f} GB")
-    print(f" [*] Verifiable source file script payload: {code_gb:.2f} GB")
+    print(f" [*] Verifiable source code file footprint:  {code_gb:.2f} GB")
     print("-------------------------------------------------------")
     
     if code_gb >= 7.8:
-        print("✅ SUCCESS: ISO root contains verified multi-gigabyte structural components.")
+        print("✅ SUCCESS: ISO root contains verified multi-gigabyte structural application source profiles.")
         print("=======================================================\n")
     else:
-        print("⚠️ WARNING: Insufficient codebase metrics.")
+        print("❌ ERROR: The storage matrix does not contain 8GB of c/c++ or text development files.")
         print("=======================================================\n")
+        sys.exit(1)
 
 if __name__ == '__main__':
     target_dir = "iso_root"
     if os.path.exists(target_dir):
         scan_workspace(target_dir)
     else:
-        print(f"❌ Error: Targets matching folder location '{target_dir}' could not be evaluated.")
+        print(f"❌ Error: Target folder location '{target_dir}' could not be evaluated.")
         sys.exit(1)
