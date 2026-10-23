@@ -1,5 +1,5 @@
 # .github/workflows/build.yml
-name: Horizon OS Fixed Large ISO Pipeline
+name: Horizon OS Automated Git Auto-Commit & ISO Build Pipeline
 
 on:
   push:
@@ -10,9 +10,14 @@ jobs:
   build_workspace_and_iso:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
     - name: Checkout Source Code
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Python Environment
       uses: actions/setup-python@v5
@@ -22,6 +27,16 @@ jobs:
     - name: Run Python Project Workspace Generator
       run: |
         python3 src/generate_ipad_workspace.py
+
+    - name: Commit Generated Core Files Back to GitHub Repository
+      run: |
+        git config --global user.name "Horizon-OS-Builder[bot]"
+        git config --global user.email "horizon-os-builder-bot@://github.com"
+        if [ -n "$(git status --porcelain src/)" ] || [ -n "$(git status --porcelain .gitignore)" ]; then
+          git add src/ .gitignore
+          git commit -m "chore(automated): Sync generated source tracks and mock application indexes"
+          git push origin main
+        fi
 
     - name: Install System Toolchains and ISO Tools
       run: |
@@ -56,6 +71,7 @@ jobs:
         cp horizon_subsystem iso_root/boot/horizon_subsystem
         cp horizon_store iso_root/boot/horizon_store
         if [ -f assets/extant ]; then cp assets/extant iso_root/assets/extant; fi
+        cp src/store/app_manifest.json iso_root/store_data/app_manifest.json
         
         python3 -c "
         with open('iso_root/store_data/horizon_packages.db', 'w') as f:
@@ -70,12 +86,11 @@ jobs:
 
     - name: Compile Everything Into Large ISO Target
       run: |
-        # Passes the mandatory override switches directly to the underlying build tool
         grub-mkrescue -o horizon.iso iso_root -- -iso-level 3
 
     - name: Upload High Capacity Horizon ISO Distribution
       uses: actions/upload-artifact@v4
       with:
-        name: Horizon-OS-HighCapacity-ISO
+        name: horizon-os-build
         path: |
           horizon.iso
