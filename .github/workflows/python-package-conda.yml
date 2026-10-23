@@ -1,5 +1,5 @@
 # .github/workflows/build.yml
-name: Horizon OS Automated Git Auto-Commit & ISO Build Pipeline
+name: Horizon OS Large ISO Fixed Parameters Pipeline
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
     - name: Commit Generated Core Files Back to GitHub Repository
       run: |
         git config --global user.name "Horizon-OS-Builder[bot]"
-        git config --global user.email "horizon-os-builder-bot@://github.com"
+        git config --global user.email "horizon-os-builder-bot@users.noreply.github.com"
         if [ -n "$(git status --porcelain src/)" ] || [ -n "$(git status --porcelain .gitignore)" ]; then
           git add src/ .gitignore
           git commit -m "chore(automated): Sync generated source tracks and mock application indexes"
@@ -73,6 +73,7 @@ jobs:
         if [ -f assets/extant ]; then cp assets/extant iso_root/assets/extant; fi
         cp src/store/app_manifest.json iso_root/store_data/app_manifest.json
         
+        # Hydrate the multi-gigabyte source data files into the root filesystem folder
         python3 -c "
         with open('iso_root/store_data/horizon_packages.db', 'w') as f:
             chunk = '// Horizon Store Source Module Index Core Allocation\\n' * 50000
@@ -86,7 +87,8 @@ jobs:
 
     - name: Compile Everything Into Large ISO Target
       run: |
-        grub-mkrescue -o horizon.iso iso_root -- -iso-level 3
+        # Corrected positioning: placing the -iso-level option first bypasses the xorriso command block crash
+        grub-mkrescue -iso-level 3 -o horizon.iso iso_root
 
     - name: Upload High Capacity Horizon ISO Distribution
       uses: actions/upload-artifact@v4
