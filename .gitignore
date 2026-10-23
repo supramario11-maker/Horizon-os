@@ -1,0 +1,7 @@
+*.o
+*.bin
+horizon_subsystem
+horizon_store
+*.img
+*.iso
+iso_root/
