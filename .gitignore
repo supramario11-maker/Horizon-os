@@ -1,7 +1,5 @@
 *.o
-*.elf
-horizon_subsystem
-horizon_store
+*.bin
 *.img
 *.iso
 iso_root/
